@@ -1,0 +1,129 @@
+# Grafana Alerting Rules - Mercenary Platform
+# See: https://grafana.com/docs/grafana/latest/alerting/set-up/provision-alerting-resources/file-provisioning/
+apiVersion: 1
+
+groups:
+  - orgId: 1
+    name: Railway Production
+    folder: DevOps
+    interval: 1m
+    rules:
+      - uid: alert-service-down
+        title: "🔴 Service Down"
+        condition: B
+        data:
+          - refId: A
+            datasourceUid: grafana_prometheus
+            model:
+              expr: up{}
+              instant: true
+              refId: A
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator: { params: [1], type: lt }
+                  operator: { type: and }
+                  query: { params: [A] }
+                  reducer: { params: [], type: last }
+                  type: query
+              refId: B
+              type: classic_conditions
+        for: 2m
+        annotations:
+          summary: "Un servicio de Railway está caído"
+          description: "{{ $labels.instance }} no responde hace más de 2 minutos."
+        labels:
+          severity: critical
+          team: devops
+        isPaused: false
+
+      - uid: alert-high-error-rate
+        title: "⚠️ High Error Rate (5xx > 10%)"
+        condition: B
+        data:
+          - refId: A
+            datasourceUid: grafana_prometheus
+            model:
+              expr: rate(http_requests_total{status=~"5.."}[5m]) / rate(http_requests_total[5m])
+              instant: true
+              refId: A
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator: { params: [0.1], type: gt }
+                  operator: { type: and }
+                  query: { params: [A] }
+                  reducer: { params: [], type: last }
+                  type: query
+              refId: B
+              type: classic_conditions
+        for: 5m
+        annotations:
+          summary: "Tasa de errores 5xx superior al 10%"
+          description: "La tasa de errores HTTP 5xx supera el 10% en los últimos 5 minutos."
+        labels:
+          severity: warning
+          team: devops
+        isPaused: false
+
+      - uid: alert-db-connections-high
+        title: "⚠️ DB Connections > 80"
+        condition: B
+        data:
+          - refId: A
+            datasourceUid: grafana_postgres
+            model:
+              rawSql: "SELECT count(*) as count FROM pg_stat_activity WHERE state = 'active'"
+              format: table
+              refId: A
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator: { params: [80], type: gt }
+                  operator: { type: and }
+                  query: { params: [A] }
+                  reducer: { params: [], type: last }
+                  type: query
+              refId: B
+              type: classic_conditions
+        for: 3m
+        annotations:
+          summary: "Alto número de conexiones activas en PostgreSQL"
+          description: "Se detectaron más de 80 conexiones activas en la base de datos."
+        labels:
+          severity: warning
+          team: devops
+        isPaused: false
+
+      - uid: alert-high-p95-latency
+        title: "⚠️ High P95 Latency (> 2s)"
+        condition: B
+        data:
+          - refId: A
+            datasourceUid: grafana_prometheus
+            model:
+              expr: histogram_quantile(0.95, rate(http_request_duration_ms_bucket[5m]))
+              instant: true
+              refId: A
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              conditions:
+                - evaluator: { params: [2000], type: gt }
+                  operator: { type: and }
+                  query: { params: [A] }
+                  reducer: { params: [], type: last }
+                  type: query
+              refId: B
+              type: classic_conditions
+        for: 5m
+        annotations:
+          summary: "Latencia P95 superior a 2 segundos"
+          description: "El percentil 95 de latencia HTTP supera los 2000ms."
+        labels:
+          severity: warning
+          team: devops
+        isPaused: false

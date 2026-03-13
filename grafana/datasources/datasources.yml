@@ -1,46 +1,64 @@
-# Configuration file version
-# See here fore more information on configuration:
-# https://grafana.com/docs/grafana/latest/administration/provisioning/#example-data-source-configuration-file
+# Grafana Datasources - Mercenary Platform
+# See: https://grafana.com/docs/grafana/latest/administration/provisioning/#data-sources
 apiVersion: 1
 
-# Mark provisioned data sources for deletion if they are no longer in a provisioning file.
+# Do not delete provisioned datasources when removed from config
 prune: false
 
-# List of data sources to insert/update depending on what's available.
 datasources:
   - name: Loki
     type: loki
-    access: direct
+    access: proxy
     orgId: 1
-    uid: grafana_lokiq
-    url: $LOKI_INTERNAL_URL
-    user:
-    database:
-    basicAuth:
-    basicAuthUser:
-    withCredentials:
+    uid: grafana_loki
+    url: ${LOKI_INTERNAL_URL}
     isDefault: true
+    editable: false
+
   - name: Prometheus
     type: prometheus
     access: proxy
     orgId: 1
     uid: grafana_prometheus
-    url: $PROMETHEUS_INTERNAL_URL
-    user:
-    database:
-    basicAuth:
-    basicAuthUser:
-    withCredentials:
+    url: ${PROMETHEUS_INTERNAL_URL}
     isDefault: false
+    jsonData:
+      httpMethod: POST
+      exemplarTraceIdDestinations:
+        - name: traceID
+          datasourceUid: grafana_tempo
+    editable: false
+
   - name: Tempo
     type: tempo
     access: proxy
     orgId: 1
     uid: grafana_tempo
-    url: $TEMPO_INTERNAL_URL
-    user:
-    database:
-    basicAuth:
-    basicAuthUser:
-    withCredentials:
+    url: ${TEMPO_INTERNAL_URL}
     isDefault: false
+    jsonData:
+      tracesToLogsV2:
+        datasourceUid: grafana_loki
+      tracesToMetrics:
+        datasourceUid: grafana_prometheus
+      serviceMap:
+        datasourceUid: grafana_prometheus
+    editable: false
+
+  - name: PostgreSQL
+    type: postgres
+    access: proxy
+    orgId: 1
+    uid: grafana_postgres
+    url: ${PG_INTERNAL_HOST}:${PG_INTERNAL_PORT}
+    user: ${PG_USER}
+    secureJsonData:
+      password: ${PG_PASSWORD}
+    jsonData:
+      database: ${PG_DATABASE}
+      sslmode: 'require'
+      postgresVersion: 1400
+      timescaledb: false
+    isDefault: false
+    readOnly: true
+    editable: false

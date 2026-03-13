@@ -1,0 +1,88 @@
+{
+  "__inputs": [],
+  "__requires": [],
+  "annotations": { "list": [] },
+  "description": "PostgreSQL database health — Mercenary Platform",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "datasource": { "type": "postgres", "uid": "grafana_postgres" },
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null }, { "color": "yellow", "value": 50 }, { "color": "red", "value": 80 } ] }, "unit": "short" }, "overrides": [] },
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 0 },
+      "id": 1,
+      "options": { "colorMode": "background", "graphMode": "none", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": [ "lastNotNull" ], "fields": "", "values": false }, "textMode": "auto" },
+      "pluginVersion": "11.5.2",
+      "targets": [ { "datasource": { "type": "postgres", "uid": "grafana_postgres" }, "format": "table", "rawSql": "SELECT count(*) as \"Active Connections\" FROM pg_stat_activity WHERE state = 'active'", "refId": "A" } ],
+      "title": "🔗 Active Connections",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "postgres", "uid": "grafana_postgres" },
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null }, { "color": "yellow", "value": 30 }, { "color": "red", "value": 60 } ] }, "unit": "short" }, "overrides": [] },
+      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 0 },
+      "id": 2,
+      "options": { "colorMode": "background", "graphMode": "none", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": [ "lastNotNull" ], "fields": "", "values": false }, "textMode": "auto" },
+      "pluginVersion": "11.5.2",
+      "targets": [ { "datasource": { "type": "postgres", "uid": "grafana_postgres" }, "format": "table", "rawSql": "SELECT count(*) as \"Wait Events\" FROM pg_stat_activity WHERE wait_event IS NOT NULL", "refId": "A" } ],
+      "title": "⏳ Wait Events",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "postgres", "uid": "grafana_postgres" },
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "unit": "percentunit", "thresholds": { "mode": "absolute", "steps": [ { "color": "red", "value": null }, { "color": "yellow", "value": 0.8 }, { "color": "green", "value": 0.95 } ] } }, "overrides": [] },
+      "gridPos": { "h": 4, "w": 6, "x": 12, "y": 0 },
+      "id": 3,
+      "options": { "colorMode": "background", "graphMode": "none", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": [ "lastNotNull" ], "fields": "", "values": false }, "textMode": "auto" },
+      "pluginVersion": "11.5.2",
+      "targets": [ { "datasource": { "type": "postgres", "uid": "grafana_postgres" }, "format": "table", "rawSql": "SELECT ROUND(sum(blks_hit)::numeric / NULLIF(sum(blks_hit) + sum(blks_read), 0), 4) as cache_hit_ratio FROM pg_stat_database", "refId": "A" } ],
+      "title": "📦 Cache Hit Ratio",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "postgres", "uid": "grafana_postgres" },
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "unit": "bytes", "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null }, { "color": "yellow", "value": 524288000 }, { "color": "red", "value": 1073741824 } ] } }, "overrides": [] },
+      "gridPos": { "h": 4, "w": 6, "x": 18, "y": 0 },
+      "id": 4,
+      "options": { "colorMode": "background", "graphMode": "none", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": [ "lastNotNull" ], "fields": "", "values": false }, "textMode": "auto" },
+      "pluginVersion": "11.5.2",
+      "targets": [ { "datasource": { "type": "postgres", "uid": "grafana_postgres" }, "format": "table", "rawSql": "SELECT pg_database_size(current_database()) as db_size", "refId": "A" } ],
+      "title": "💿 Database Size",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "postgres", "uid": "grafana_postgres" },
+      "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" }, "custom": { "align": "auto", "cellOptions": { "type": "auto" } } }, "overrides": [ { "matcher": { "id": "byName", "options": "duration" }, "properties": [ { "id": "custom.width", "value": 120 }, { "id": "unit", "value": "ms" } ] } ] },
+      "gridPos": { "h": 10, "w": 24, "x": 0, "y": 4 },
+      "id": 5,
+      "options": { "cellHeight": "sm", "footer": { "countRows": false, "fields": "", "reducer": [ "sum" ], "show": false }, "showHeader": true, "sortBy": [ { "desc": true, "displayName": "duration" } ] },
+      "pluginVersion": "11.5.2",
+      "targets": [ { "datasource": { "type": "postgres", "uid": "grafana_postgres" }, "format": "table", "rawSql": "SELECT pid, usename, application_name, state, EXTRACT(EPOCH FROM (now() - query_start)) * 1000 as duration, LEFT(query, 100) as query FROM pg_stat_activity WHERE state != 'idle' AND query_start IS NOT NULL ORDER BY duration DESC LIMIT 20", "refId": "A" } ],
+      "title": "🐢 Active Queries (Top 20 by Duration)",
+      "type": "table"
+    },
+    {
+      "datasource": { "type": "postgres", "uid": "grafana_postgres" },
+      "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" }, "custom": { "align": "auto", "cellOptions": { "type": "auto" } } }, "overrides": [ { "matcher": { "id": "byName", "options": "total_size" }, "properties": [ { "id": "unit", "value": "bytes" } ] } ] },
+      "gridPos": { "h": 10, "w": 24, "x": 0, "y": 14 },
+      "id": 6,
+      "options": { "cellHeight": "sm", "footer": { "countRows": false, "fields": "", "reducer": [ "sum" ], "show": false }, "showHeader": true, "sortBy": [ { "desc": true, "displayName": "total_size" } ] },
+      "pluginVersion": "11.5.2",
+      "targets": [ { "datasource": { "type": "postgres", "uid": "grafana_postgres" }, "format": "table", "rawSql": "SELECT schemaname, tablename, pg_total_relation_size(schemaname||'.'||tablename) AS total_size, pg_relation_size(schemaname||'.'||tablename) AS table_size, pg_indexes_size(schemaname||'.'||tablename) AS index_size FROM pg_tables WHERE schemaname = 'public' ORDER BY total_size DESC LIMIT 20", "refId": "A" } ],
+      "title": "📊 Table Sizes",
+      "type": "table"
+    }
+  ],
+  "refresh": "1m",
+  "schemaVersion": 38,
+  "tags": [ "postgresql", "database", "devops", "mercenary" ],
+  "time": { "from": "now-1h", "to": "now" },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "02 - Database Health",
+  "uid": "mercenary-db-health",
+  "version": 1
+}

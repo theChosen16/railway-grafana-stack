@@ -1,0 +1,15 @@
+# Grafana Dashboard Provisioning - Mercenary Platform
+apiVersion: 1
+
+providers:
+  - name: mercenary-devops
+    orgId: 1
+    folder: DevOps
+    folderUid: mercenary-devops
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 30
+    allowUiUpdates: true
+    options:
+      path: /etc/grafana/provisioning/dashboards
+      foldersFromFilesStructure: false

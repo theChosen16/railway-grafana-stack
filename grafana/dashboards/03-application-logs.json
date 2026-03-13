@@ -1,0 +1,96 @@
+{
+  "__inputs": [],
+  "__requires": [],
+  "annotations": { "list": [] },
+  "description": "Application logs and events — Mercenary Platform",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "datasource": { "type": "loki", "uid": "grafana_loki" },
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null }, { "color": "yellow", "value": 10 }, { "color": "red", "value": 50 } ] }, "unit": "short" }, "overrides": [] },
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 0 },
+      "id": 1,
+      "options": { "colorMode": "background", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": [ "sum" ], "fields": "", "values": false }, "textMode": "auto" },
+      "pluginVersion": "11.5.2",
+      "targets": [ { "datasource": { "type": "loki", "uid": "grafana_loki" }, "expr": "sum(count_over_time({service=\"mercenary-web\"} |= \"error\" [5m]))", "legendFormat": "Errors (5m)", "refId": "A" } ],
+      "title": "🚨 Errores últimos 5m",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "loki", "uid": "grafana_loki" },
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null }, { "color": "yellow", "value": 5 }, { "color": "red", "value": 20 } ] }, "unit": "short" }, "overrides": [] },
+      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 0 },
+      "id": 2,
+      "options": { "colorMode": "background", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": [ "sum" ], "fields": "", "values": false }, "textMode": "auto" },
+      "pluginVersion": "11.5.2",
+      "targets": [ { "datasource": { "type": "loki", "uid": "grafana_loki" }, "expr": "sum(count_over_time({service=\"mercenary-web\"} |= \"mercadopago\" [5m]))", "legendFormat": "MP Events", "refId": "A" } ],
+      "title": "💳 Eventos MercadoPago (5m)",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "loki", "uid": "grafana_loki" },
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null }, { "color": "yellow", "value": 3 }, { "color": "red", "value": 10 } ] }, "unit": "short" }, "overrides": [] },
+      "gridPos": { "h": 4, "w": 6, "x": 12, "y": 0 },
+      "id": 3,
+      "options": { "colorMode": "background", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": [ "sum" ], "fields": "", "values": false }, "textMode": "auto" },
+      "pluginVersion": "11.5.2",
+      "targets": [ { "datasource": { "type": "loki", "uid": "grafana_loki" }, "expr": "sum(count_over_time({service=\"mercenary-web\"} |= \"WARN\" [5m]))", "legendFormat": "Warnings", "refId": "A" } ],
+      "title": "⚠️ Warnings (5m)",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "loki", "uid": "grafana_loki" },
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null } ] }, "unit": "short" }, "overrides": [] },
+      "gridPos": { "h": 4, "w": 6, "x": 18, "y": 0 },
+      "id": 4,
+      "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": [ "sum" ], "fields": "", "values": false }, "textMode": "auto" },
+      "pluginVersion": "11.5.2",
+      "targets": [ { "datasource": { "type": "loki", "uid": "grafana_loki" }, "expr": "sum(count_over_time({service=\"mercenary-web\"} [5m]))", "legendFormat": "Total Lines", "refId": "A" } ],
+      "title": "📋 Log Lines (5m)",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "loki", "uid": "grafana_loki" },
+      "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" }, "custom": { "fillOpacity": 20, "lineWidth": 1, "showPoints": "never" }, "unit": "short" }, "overrides": [] },
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 4 },
+      "id": 5,
+      "options": { "legend": { "calcs": [ "sum" ], "displayMode": "table", "placement": "right" }, "tooltip": { "mode": "multi" } },
+      "targets": [
+        { "datasource": { "type": "loki", "uid": "grafana_loki" }, "expr": "sum by (level) (count_over_time({service=\"mercenary-web\"} | json | level != \"\" [$__interval]))", "legendFormat": "{{level}}", "refId": "A" }
+      ],
+      "title": "📊 Log Frequency by Level",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "loki", "uid": "grafana_loki" },
+      "gridPos": { "h": 14, "w": 24, "x": 0, "y": 12 },
+      "id": 6,
+      "options": { "dedupStrategy": "none", "enableLogDetails": true, "prettifyLogMessage": false, "showCommonLabels": false, "showLabels": false, "showTime": true, "sortOrder": "Descending", "wrapLogMessage": false },
+      "targets": [ { "datasource": { "type": "loki", "uid": "grafana_loki" }, "expr": "{service=\"mercenary-web\"} |= `error`", "legendFormat": "", "refId": "A" } ],
+      "title": "🔴 Live Error Logs — mercenary-web",
+      "type": "logs"
+    },
+    {
+      "datasource": { "type": "loki", "uid": "grafana_loki" },
+      "gridPos": { "h": 10, "w": 24, "x": 0, "y": 26 },
+      "id": 7,
+      "options": { "dedupStrategy": "none", "enableLogDetails": true, "prettifyLogMessage": true, "showCommonLabels": false, "showLabels": true, "showTime": true, "sortOrder": "Descending", "wrapLogMessage": true },
+      "targets": [ { "datasource": { "type": "loki", "uid": "grafana_loki" }, "expr": "{service=\"mercenary-web\"} |= `mercadopago`", "legendFormat": "", "refId": "A" } ],
+      "title": "💳 MercadoPago Webhook Events",
+      "type": "logs"
+    }
+  ],
+  "refresh": "15s",
+  "schemaVersion": 38,
+  "tags": [ "logs", "loki", "mercenary", "devops" ],
+  "time": { "from": "now-1h", "to": "now" },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "03 - Application Logs",
+  "uid": "mercenary-app-logs",
+  "version": 1
+}
