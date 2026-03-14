@@ -1,5 +1,4 @@
 # Grafana Datasources - Mercenary Platform
-# See: https://grafana.com/docs/grafana/latest/administration/provisioning/
 apiVersion: 1
 
 prune: false
@@ -7,31 +6,40 @@ prune: false
 datasources:
   - name: Loki
     type: loki
-    access: proxy
+    access: direct
     orgId: 1
-    uid: grafana_loki
+    uid: grafana_lokiq
     url: $LOKI_INTERNAL_URL
+    user:
+    database:
+    basicAuth:
+    basicAuthUser:
+    withCredentials:
     isDefault: true
-    editable: false
-
   - name: Prometheus
     type: prometheus
     access: proxy
     orgId: 1
     uid: grafana_prometheus
     url: $PROMETHEUS_INTERNAL_URL
+    user:
+    database:
+    basicAuth:
+    basicAuthUser:
+    withCredentials:
     isDefault: false
-    editable: false
-
   - name: Tempo
     type: tempo
     access: proxy
     orgId: 1
     uid: grafana_tempo
     url: $TEMPO_INTERNAL_URL
+    user:
+    database:
+    basicAuth:
+    basicAuthUser:
+    withCredentials:
     isDefault: false
-    editable: false
-
   - name: PostgreSQL
     type: postgres
     access: proxy
@@ -47,5 +55,4 @@ datasources:
       postgresVersion: 1500
       timescaledb: false
     isDefault: false
-    readOnly: true
-    editable: false
+    editable: true
