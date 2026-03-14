@@ -2,7 +2,8 @@ ARG VERSION=11.5.2
 
 FROM grafana/grafana-oss:${VERSION}
 
-# copy the datasources, dashboards and alerting provisioning
+# copy provisioning configs
 COPY datasources /etc/grafana/provisioning/datasources
 COPY dashboards  /etc/grafana/provisioning/dashboards
-COPY alerting    /etc/grafana/provisioning/alerting
+# NOTE: alerting provisioning temporarily disabled — configure via Grafana UI
+# COPY alerting    /etc/grafana/provisioning/alerting
