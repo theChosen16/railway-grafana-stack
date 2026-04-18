@@ -1,14 +1,11 @@
 ARG VERSION=11.5.2
 
-FROM grafana/grafana-oss:${VERSION}
+FROM grafana/grafana:${VERSION}
 
-# Pre-install only React-compatible plugins (no Angular plugins)
-# grafana-clock-panel v2.x is React-based and v12 compatible
-USER root
-RUN grafana-cli --pluginsDir /var/lib/grafana/plugins plugins install grafana-clock-panel
-USER grafana
+# Install plugins at container start so Railway's volume mount does not mask them.
+ENV GF_PLUGINS_PREINSTALL=grafana-clock-panel
 
 # copy provisioning configs
 COPY datasources     /etc/grafana/provisioning/datasources
 COPY dashboards/provider.yml /etc/grafana/provisioning/dashboards/provider.yml
-COPY dashboards/json /var/lib/grafana/dashboards
+COPY dashboards/json /etc/grafana/provisioning/dashboards/json

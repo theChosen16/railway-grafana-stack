@@ -39,7 +39,7 @@ This template is perfect for teams who need a comprehensive observability soluti
 | `GF_SECURITY_ADMIN_USER` | Username for the Grafana admin account | Required input |
 | `GF_SECURITY_ADMIN_PASSWORD` | Password for the Grafana admin account | Auto-generated secure string |
 | `GF_DEFAULT_INSTANCE_NAME` | Name of your Grafana instance | `Grafana on Railway` |
-| `GF_INSTALL_PLUGINS` | Comma-separated list of Grafana plugins to install | `grafana-simple-json-datasource,grafana-piechart-panel,grafana-worldmap-panel,grafana-clock-panel` |
+| `GF_PLUGINS_PREINSTALL` | Comma-separated list of Grafana plugins to install at container start | `grafana-clock-panel` |
 
 ### Internal Service URLs
 
@@ -89,8 +89,10 @@ This template deploys four interconnected services:
 - The central visualization and dashboarding platform
 - Pre-configured with connections to all other services
 - Persistent volume for storing dashboards, users, and configurations
-- Comes with useful plugins pre-installed
+- Comes with useful plugins pre-installed at container start
 - Exposes internal URLs for other Railway services to connect to Loki, Prometheus, and Tempo
+
+Grafana dashboards are provisioned from `/etc/grafana/provisioning/dashboards/json` so the persistent volume mounted at `/var/lib/grafana` does not mask the JSON files during runtime.
 
 ### Prometheus
 - Time-series database for metrics collection
